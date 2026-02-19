@@ -1,13 +1,16 @@
-ADR-002: Use Outbox Pattern for Reliable Messaging
-Title
+# ADR-002: Use Outbox Pattern for Reliable Messaging
+
+## Title
+
 Use Outbox Pattern to Ensure Reliable Event Publishing
 
-Context
+## Context
+
 In an event-driven microservices architecture, when a service performs a business operation (e.g., creating an order), it typically needs to:
 
-Save data to its database
+- Save data to its database
 
-Publish an event to a message broker
+- Publish an event to a message broker
 
 However, the database and the message broker are separate systems and do not share a transaction.
 
@@ -17,22 +20,24 @@ Distributed transactions (e.g., two-phase commit) could theoretically solve this
 
 Therefore, a reliable mechanism is required to guarantee that events are not lost.
 
-Decision
+## Decision
+
 We will implement the Outbox Pattern.
 
 The service will:
 
-Save business data and event data within the same database transaction
+- Save business data and event data within the same database transaction
 
-Store the event in a dedicated Outbox table
+- Store the event in a dedicated Outbox table
 
-Use a background worker to read events from the Outbox table
+- Use a background worker to read events from the Outbox table
 
-Publish events asynchronously to the message broker
+- Publish events asynchronously to the message broker
 
-Mark events as SENT after successful publishing
+- Mark events as SENT after successful publishing
 
-Rationale
+## Rationale
+
 The Outbox Pattern ensures atomicity between business data and event storage because both are committed in the same database transaction.
 
 If the transaction succeeds, the event is guaranteed to exist in the Outbox table.
@@ -41,28 +46,33 @@ Publishing is handled separately by a background worker. If publishing fails, th
 
 This approach improves reliability while maintaining scalability in distributed systems.
 
-Consequences
-Pros – What becomes easier?
-Reliable event delivery
+## Consequences
 
-No need for distributed transactions
+### Pros – What becomes easier?
 
-Increased data consistency
+- Reliable event delivery
 
-Production-proven architectural pattern
+- No need for distributed transactions
 
-Cons – What becomes more difficult?
-Requires an additional Outbox table
+- Increased data consistency
 
-Requires a background worker process
+- Production-proven architectural pattern
 
-Eventual consistency instead of immediate consistency
+### Cons – What becomes more difficult?
 
-Duplicate message handling (idempotency) must be considered
+- Requires an additional Outbox table
 
-Sample Code
-Example: Saving business data + outbox event in the same transaction (Python with SQLite)
+- Requires a background worker process
 
+- Eventual consistency instead of immediate consistency
+
+- Duplicate message handling (idempotency) must be considered
+
+## Sample Code
+
+**Example: Saving business data + outbox event in the same transaction (Python with SQLite)**
+
+```python
 import sqlite3
 import json
 from datetime import datetime
