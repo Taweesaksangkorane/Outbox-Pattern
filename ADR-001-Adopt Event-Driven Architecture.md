@@ -4,7 +4,6 @@
 
 Adopt Event-Driven Architecture for Service Communication
 
----
 
 ## Context
 
@@ -17,7 +16,6 @@ Our system is built using a microservices architecture where each service owns i
 
 **Need:** A reliable and scalable communication model between services.
 
----
 
 ## Decision
 
@@ -28,20 +26,18 @@ We will adopt an **Event-Driven Architecture (EDA)** where services communicate 
 - Subscribe to relevant events from other services
 - Process events asynchronously
 
----
 
 ## Rationale
 
 Event-Driven Architecture provides **loose coupling** between services. Services do not directly call each other but instead react to events.
 
 **This approach:**
-- ✅ Improves scalability by enabling asynchronous processing
-- ✅ Reduces tight coupling between services
-- ✅ Enhances system resilience (one service failure does not immediately break others)
-- ✅ Supports distributed systems and cloud-native environments
-- ✅ Aligns well with microservices architecture principles
+-  Improves scalability by enabling asynchronous processing
+-  Reduces tight coupling between services
+-  Enhances system resilience (one service failure does not immediately break others)
+-  Supports distributed systems and cloud-native environments
+-  Aligns well with microservices architecture principles
 
----
 
 ## Consequences
 
@@ -57,7 +53,6 @@ Event-Driven Architecture provides **loose coupling** between services. Services
 - Handling eventual consistency
 - Requires message broker infrastructure
 
----
 
 ## Sample Code
 
