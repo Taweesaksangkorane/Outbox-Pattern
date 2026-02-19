@@ -29,9 +29,8 @@ We will implement the Outbox Pattern.
 ## Rationale
 The Outbox Pattern ensures atomicity between business data and event storage because both are committed in the same database transaction.
 If the transaction succeeds, the event is guaranteed to exist in the Outbox table.
-
-
-## This approach improves reliability while maintaining scalability.
+ This approach improves reliability while maintaining scalability.
+ 
 ## Consequences
 
 ### Pros – What becomes easier?
