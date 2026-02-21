@@ -1,100 +1,101 @@
-# ADR-001: Adopt Event-Driven Architecture
+# ADR-001: Adopt Event-Driven Architecture for Service Communication in E-Commerce Platform
 
 ## Title
 
-Adopt Event-Driven Architecture for Service Communication
+Adopt Event-Driven Architecture for Service Communication in E-Commerce
+Platform
 
 ## Context
 
-Our system is designed using a microservices architecture, where each service owns its own database and operates independently. Services must communicate when business events occur, such as OrderCreated or PaymentCompleted.
+Our system is an e-commerce platform where customers can place orders
+online. The system consists of multiple microservices, including:
 
-Traditional synchronous communication (e.g., REST calls between services) tightly couples services and increases the risk of cascading failures. If one service becomes unavailable, dependent services may also fail.
+-   Order Service
+-   Payment Service
+-   Inventory Service
+-   Notification Service
 
-In addition, the system must support high scalability and asynchronous processing to handle increasing workloads efficiently.
+Each service owns its own database and operates independently.
 
-Therefore, a reliable and scalable communication model between services is required.
+When a customer places an order, multiple services must react to that
+event. For example:
+
+-   The Payment Service must process payment
+-   The Inventory Service must reserve stock
+-   The Notification Service must send confirmation
+
+Using synchronous REST communication would tightly couple services and
+increase the risk of cascading failures.
+
+Therefore, a scalable and loosely coupled communication model is
+required.
 
 ## Decision
 
-We will adopt an Event-Driven Architecture (EDA) where services communicate by publishing and subscribing to events through a message broker (e.g., Kafka or RabbitMQ).
+We will adopt an Event-Driven Architecture (EDA).
 
-Each service will:
-
-- Publish events when a business state changes
-
-- Subscribe to relevant events from other services
-
-- Process events asynchronously
+Services will communicate by publishing and subscribing to events
+through a message broker (e.g., Kafka or RabbitMQ).
 
 ## Rationale
 
-Event-Driven Architecture provides loose coupling between services. Instead of directly calling one another, services react to events emitted by other services.
+Event-Driven Architecture enables loose coupling between services.
+Instead of calling each other directly, services react to business
+events.
 
 This approach:
 
-- Improves scalability by enabling asynchronous processing
+-   Improves scalability through asynchronous processing
+-   Reduces service coupling
+-   Increases resilience
+-   Supports distributed deployment
 
-- Reduces tight coupling between services
-
-- Enhances system resilience (a failure in one service does not immediately break others)
-
-- Supports distributed systems and cloud-native environments
-
-Therefore, EDA is a suitable architectural style for scalable and resilient microservices systems.
+This design introduces eventual consistency, which is acceptable for our
+e-commerce domain.
 
 ## Consequences
 
-### Pros – What becomes easier?
+### Pros
 
-- Better scalability
+-   Better scalability
+-   Independent service deployment
+-   Reduced cascading failures
+-   Supports high traffic workloads
 
-- Loose coupling between services
+### Cons
 
-- Independent service deployment
-
-- Improved fault tolerance
-
-### Cons – What becomes more difficult?
-
-- Increased architectural complexity
-
-- Event monitoring and debugging become harder
-
-- Handling eventual consistency
-
-- Requires message broker infrastructure
+-   Increased architectural complexity
+-   Harder debugging and event tracing
+-   Eventual consistency between services
+-   Requires message broker infrastructure
 
 ## Sample Code
 
 Example: Publishing an event (Python with RabbitMQ)
 
-```python
+``` python
 import json
 import pika
 
-# Connect to message broker
 connection = pika.BlockingConnection(
     pika.ConnectionParameters(host='localhost')
 )
 channel = connection.channel()
 
-# Declare durable queue
 channel.queue_declare(queue='order_events', durable=True)
 
-# Create event
 event = {
     "event_type": "OrderCreated",
     "order_id": 123,
     "amount": 250
 }
 
-# Publish event
 channel.basic_publish(
     exchange='',
     routing_key='order_events',
     body=json.dumps(event)
 )
 
-print("✓ Event published successfully")
+print("Event published successfully")
 connection.close()
 ```
